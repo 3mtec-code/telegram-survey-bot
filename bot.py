@@ -677,7 +677,6 @@ async def unexpected(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 # ─────────────────────────────────────────────────────────────────────────────
 
 def main() -> None:
-    ensure_csv()
     app = Application.builder().token(BOT_TOKEN).build()
 
     DONE_FILTER = filters.Regex(r"✅ Done")
