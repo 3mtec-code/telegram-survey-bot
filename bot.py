@@ -6,9 +6,13 @@
 ================================================================================
 """
 
+import csv
 import logging
 import os
 import sys
+from dotenv import load_dotenv
+
+load_dotenv()
 from datetime import datetime
 from supabase import create_client, Client
 
@@ -599,6 +603,19 @@ async def finish(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         logger.info("Survey response saved to Supabase for user %s", row.get("user_id"))
     except Exception as exc:
         logger.error("Supabase insert failed: %s", exc)
+
+    # Save to local CSV file
+    try:
+        csv_path = os.path.join(os.path.dirname(__file__), "survey_responses.csv")
+        file_exists = os.path.isfile(csv_path)
+        with open(csv_path, "a", newline="", encoding="utf-8-sig") as f:
+            writer = csv.DictWriter(f, fieldnames=row.keys())
+            if not file_exists or os.path.getsize(csv_path) == 0:
+                writer.writeheader()
+            writer.writerow(row)
+        logger.info("Survey response saved to CSV for user %s", row.get("user_id"))
+    except Exception as exc:
+        logger.error("CSV save failed: %s", exc)
 
     admin_msg = (
         "🆕 New Survey Response\n"
